@@ -26,12 +26,20 @@ class BooksController
         $params = $request->getQueryParams();
 
         // Create the new book
+        
+        /*Prepared statements
+        $sql_stmt = 'INSERT INTO books (title, author_id) VALUES (?,?)';
+        $prepare_stmt = $db->prepare($sql_stmt,array($params['title'],$params['author_id']));
+        $prepare_stmt->execute();
+        $book_id = $prepare_stmt->lastInsertId();       
+         */
+        
         $db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['title'].'", "'.$params['author_id'].'")');
         $book_id = $db->lastInsertId();
 
         // Create the ZAR price for the book
-        $zar = $db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
-        $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['ZAR'].')');
+        $zar = $db->query('SELECT * FROM currencies WHERE id = "'.$params['currency_id'].'"')->fetch();
+        $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price'].')');
 
         // Fetch the book we just created so we can return it in the response
         $return = $db->query('SELECT * FROM books WHERE id = '.$book_id)

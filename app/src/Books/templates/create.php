@@ -20,10 +20,21 @@
             <td>Title</td>
             <td><input type="text" name="title" /> </td>
         </tr>
+        
+        <tr>
+            <td>Currencies</td>
+            <td>
+                <select name="currency_id">
+                    <?php foreach ($currencies as $currency): ?>
+                        <option value="<?= $currency->id ?>"><?= $currency->iso ?> <?= $currency->name ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
+        </tr>
 
         <tr>
-            <td>Price (ZAR)</td>
-            <td><input type="text" name="price[ZAR]" /></td>
+            <td>Price </td>
+            <td><input type="text" name="price" /></td>
         </tr>
 
         <tr>

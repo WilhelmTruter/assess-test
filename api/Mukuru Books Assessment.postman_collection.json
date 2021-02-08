@@ -94,6 +94,184 @@
 				}
 			]
 		},
+                {
+			"name": "Currencies",
+			"item": [
+				{
+					"name": "Fetch all currencies",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://api.localtest.me:8080/currencies",
+							"protocol": "http",
+							"host": [
+								"api",
+								"localtest",
+								"me"
+							],
+							"port": "8080",
+							"path": [
+								"authors"
+							]
+						},
+						"description": "Return a list of all currencies"
+					},
+					"response": [
+						{
+							"name": "Fetch all currencies",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8080/api/books",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.15.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 05 Feb 2019 06:08:29 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "349"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.11"
+								}
+							],
+							"cookie": [],
+							"body": "[{\"id\":\"1\",\"author_id\":\"1\",\"title\":\"The old man and the sea\"},{\"id\":\"2\",\"author_id\":\"1\",\"title\":\"A Farewell to Arms\"},{\"id\":\"3\",\"author_id\":\"2\",\"title\":\"Pride and Prejudice\"},{\"id\":\"4\",\"author_id\":\"2\",\"title\":\"Sense and Sensibility\"},{\"id\":\"5\",\"author_id\":\"3\",\"title\":\"Roughing It\"},{\"id\":\"6\",\"author_id\":\"3\",\"title\":\"The Adventures of Tom Sawyer\"}]"
+						}
+					]
+				}
+			]
+		},
+                {
+			"name": "Book Pricing",
+			"item": [
+				{
+					"name": "Fetch all book pricings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://api.localtest.me:8080/book_pricing",
+							"protocol": "http",
+							"host": [
+								"api",
+								"localtest",
+								"me"
+							],
+							"port": "8080",
+							"path": [
+								"authors"
+							]
+						},
+						"description": "Return a list of all book_pricing"
+					},
+					"response": [
+						{
+							"name": "Fetch all currencies",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "http://127.0.0.1:8080/api/books",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"books"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.15.3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 05 Feb 2019 06:08:29 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html; charset=UTF-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "349"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/7.2.11"
+								}
+							],
+							"cookie": [],
+							"body": "[{\"id\":\"1\",\"author_id\":\"1\",\"title\":\"The old man and the sea\"},{\"id\":\"2\",\"author_id\":\"1\",\"title\":\"A Farewell to Arms\"},{\"id\":\"3\",\"author_id\":\"2\",\"title\":\"Pride and Prejudice\"},{\"id\":\"4\",\"author_id\":\"2\",\"title\":\"Sense and Sensibility\"},{\"id\":\"5\",\"author_id\":\"3\",\"title\":\"Roughing It\"},{\"id\":\"6\",\"author_id\":\"3\",\"title\":\"The Adventures of Tom Sawyer\"}]"
+						}
+					]
+				}
+			]
+		},
 		{
 			"name": "Books",
 			"item": [
