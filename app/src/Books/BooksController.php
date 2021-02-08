@@ -23,14 +23,39 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
-        // Loop through all books and add the author to each one for use in the listing template
+         // Get all the book pricing list
+        $ch = curl_init('http://api.localtest.me/book_pricing');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $book_pricing = json_decode(curl_exec($ch));
+        curl_close($ch);
+        
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+        
+        // Loop through all books and add the author,currency,price to each one for use in the listing template
         foreach ($books as $key => $book) {
             foreach ($authors as $author) {
                 if ($book->author_id == $author->id) {
                     $books[$key]->author = $author;
                 }
             }
-        }
+            
+            foreach($book_pricing as $price){
+                if($book->id == $price->book_id){
+                    $books[$key]->price = $price->price;
+                    
+                    foreach($currencies as $currency){
+                        if($currency->id == $price->currency_id){
+                            $books[$key]->currency = $currency->iso;
+                        }
+                    }
+                }
+                                             
+            }
+        }        
 
         $renderer = new PhpRenderer('../src/Books/templates/');
         return $renderer->render($response, 'list.php', [
@@ -57,11 +82,18 @@ class BooksController
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
+        
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
 
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }
