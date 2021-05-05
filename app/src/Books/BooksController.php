@@ -23,11 +23,37 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the book prices
+        $ch = curl_init('http://api.localtest.me/bookprices');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $bookprices = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
         // Loop through all books and add the author to each one for use in the listing template
         foreach ($books as $key => $book) {
             foreach ($authors as $author) {
                 if ($book->author_id == $author->id) {
                     $books[$key]->author = $author;
+                }
+                // find the currency and price linked to the book
+                foreach ($bookprices as  $bookprice){
+                    if ($book->id == $bookprice->book_id) {
+
+                        foreach ($currencies as  $currency){
+                            if ($currency->id == $bookprice->currency_id) {
+                                $books[$key]->currency = $currency->iso;
+                            }
+
+                            $books[$key]->price = $bookprice->price;
+                        }
+                    // you were right, i missed one of these brackets
+                    // }
                 }
             }
         }
@@ -35,6 +61,8 @@ class BooksController
         $renderer = new PhpRenderer('../src/Books/templates/');
         return $renderer->render($response, 'list.php', [
             'books' => $books,
+            // 'bookprices' => $bookprices,
+            // 'currencies' => $currencies,
         ]);
     }
 
@@ -58,10 +86,17 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }
