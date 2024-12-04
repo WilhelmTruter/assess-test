@@ -10,6 +10,7 @@ $app = new \Slim\App([
 // Web app frontend routes
 $app->get('/books', '\App\Books\BooksController:index');
 $app->get('/books/create', '\App\Books\BooksController:create');
+$app->post('/books/createBook', '\App\Books\BooksController:add');
 
 // We don't have a homepage for this web app so just head to the books listing on first load
 $app->redirect('/', '/books');
