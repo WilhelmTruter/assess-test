@@ -25,10 +25,11 @@ class BooksController
 
         // Fetch paginated books
         $query = $db->prepare(
-            'SELECT books.*, book_pricing.price, currencies.iso 
+            'SELECT books.*, book_pricing.price, currencies.iso, authors.first_name, authors.last_name
             FROM books
             JOIN book_pricing ON book_pricing.book_id = books.id
             JOIN currencies ON currencies.id = book_pricing.currency_id
+            JOIN authors ON authors.id = books.author_id
             LIMIT :limit OFFSET :offset'
         );
         $query->bindValue(':limit', $limit, \PDO::PARAM_INT);

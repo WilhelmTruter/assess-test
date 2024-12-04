@@ -27,7 +27,7 @@
                     const row = `
                         <tr class="border-b border-gray-200 hover:bg-gray-50">
                             <td class="px-6 py-4 text-sm text-gray-700">${book.title}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">${book.author?.first_name ?? 'Unknown'} ${book.author?.last_name ?? ''}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">${book.first_name ?? 'Unknown'} ${book.last_name ?? ''}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">${book.iso} ${book.price}</td>
                         </tr>
                     `;
