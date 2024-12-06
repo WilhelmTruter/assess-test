@@ -27,6 +27,7 @@ services:
       - ./app:/var/www/app
   database:
     image: mysql:5.7
+    platform: linux/amd64
     volumes:
       - assess_db:/var/lib/mysql
     environment:

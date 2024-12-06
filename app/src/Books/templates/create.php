@@ -2,6 +2,10 @@
 /**
  * @var array $authors
  */
+
+/**
+ * @var array $currency
+ */
 ?>
 <form method="get" action="">
     <table>
@@ -19,6 +23,17 @@
         <tr>
             <td>Title</td>
             <td><input type="text" name="title" /> </td>
+        </tr>
+
+        <tr>
+            <td>Currency</td>
+            <td>
+                <select name="currency">
+                    <?php foreach ($currency as $curren): ?>
+                        <option value="<?= $currency->name ?>"><?= $currency->name ?> <?= $currency->name ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </td>
         </tr>
 
         <tr>

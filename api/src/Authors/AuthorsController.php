@@ -17,4 +17,16 @@ class AuthorsController
 
         return $response->getBody()->write(json_encode($authors));
     }
+
+    public function getCurrency(Request $request, Response $response)
+    {
+        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+
+        $currency = $db->query('SELECT * FROM currencies')
+            ->fetchAll();
+
+        return $response->getBody()->write(json_encode($currency));
+    }
+
 }
