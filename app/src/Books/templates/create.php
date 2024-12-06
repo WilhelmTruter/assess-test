@@ -4,7 +4,7 @@
  */
 
 /**
- * @var array $currency
+ * @var array $currencies
  */
 ?>
 <form method="get" action="">
@@ -29,7 +29,7 @@
             <td>Currency</td>
             <td>
                 <select name="currency">
-                    <?php foreach ($currency as $curren): ?>
+                    <?php foreach ($currencies as $currency): ?>
                         <option value="<?= $currency->name ?>"><?= $currency->name ?> <?= $currency->name ?></option>
                     <?php endforeach; ?>
                 </select>
@@ -37,8 +37,8 @@
         </tr>
 
         <tr>
-            <td>Price (ZAR)</td>
-            <td><input type="text" name="price[ZAR]" /></td>
+            <td>Price</td>
+            <td><input type="text" name="price" /></td>
         </tr>
 
         <tr>

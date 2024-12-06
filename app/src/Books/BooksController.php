@@ -58,10 +58,17 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get currencies
+        $chr = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($chr, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($chr));
+        curl_close($chr);
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }
