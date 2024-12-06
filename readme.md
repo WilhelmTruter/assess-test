@@ -3,6 +3,8 @@
 - From within this directory, bring up the docker containers \
 `docker-compose up --build`
 
+P.S.: If you're running Mac M architecture, update your database instructions on docker-compose-yml to use "platform: linux/amd64"
+
 - Follow the instructions in the `./api/readme.md` and `./app/readme.md` to run service specific setup like installing the dependencies and running the migrations 
 
 - Browse to http://app.localtest.me:8080/
