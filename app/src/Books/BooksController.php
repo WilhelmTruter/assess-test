@@ -41,12 +41,15 @@ class BooksController
     public function create(Request $request, Response $response)
     {
         // Check if form data has been sent
+        // will change to POST method later
         if ($params = $request->getQueryParams()) {
             // Make the api call to create the book
             $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($params));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_exec($ch);
             curl_close($ch);
+
+            //check errors if necessary
 
             // Redirect back to book listing
             return $response->withStatus(302)->withHeader('Location', '/books');
@@ -58,10 +61,17 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the currencies
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }

@@ -9,6 +9,7 @@ $app = new \Slim\App([
 
 // Web app frontend routes
 $app->get('/books', '\App\Books\BooksController:index');
+//post method rather - or split this
 $app->get('/books/create', '\App\Books\BooksController:create');
 
 // We don't have a homepage for this web app so just head to the books listing on first load

@@ -39,7 +39,7 @@ class BookPricingTables extends AbstractMigration
 
         $this->table('book_pricing')
             ->addColumn('book_id', 'integer')
-            ->addForeignKey('book_id', 'books', 'id')
+            ->addForeignKey('book_id', 'books', 'id') //on delete cascade?
             ->addColumn('currency_id', 'integer')
             ->addForeignKey('currency_id', 'currencies', 'id')
             ->addColumn('price', 'decimal', ['precision' => 8, 'scale' => 2])

@@ -21,7 +21,7 @@ services:
     volumes:
       - ./api:/var/www/api
   app:
-    image: php:7-fpm-alpine
+    image: php:8.4-fpm-alpine
     working_dir: /var/www/app
     volumes:
       - ./app:/var/www/app

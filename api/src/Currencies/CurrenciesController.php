@@ -1,11 +1,11 @@
 <?php
 
-namespace Api\Authors;
+namespace Api\Currencies;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-class AuthorsController
+class CurrenciesController
 {
     public function index(Request $request, Response $response)
     {
@@ -13,9 +13,9 @@ class AuthorsController
         $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
         $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-        $authors = $db->query('SELECT * FROM authors')
+        $currencies = $db->query('SELECT * FROM currencies ')
             ->fetchAll();
 
-        return $response->getBody()->write(json_encode($authors));
+        return $response->getBody()->write(json_encode($currencies));
     }
 }
