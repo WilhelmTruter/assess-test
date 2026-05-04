@@ -18,11 +18,15 @@ services:
     build:
       context: ./docker/api/
     working_dir: /var/www/api
+    env_file:
+      - ./api/.env
     volumes:
       - ./api:/var/www/api
   app:
     image: php:7-fpm-alpine
     working_dir: /var/www/app
+    environment:
+      - "API_BASE_URL=http://api.localtest.me"
     volumes:
       - ./app:/var/www/app
   database:
@@ -30,9 +34,8 @@ services:
     image: mysql:5.7
     volumes:
       - assess_db:/var/lib/mysql
-    environment:
-      - "MYSQL_DATABASE=assess_db"
-      - "MYSQL_ROOT_PASSWORD=secret"
+    env_file:
+      - ./api/.env
     ports:
       - 33066:3306
 volumes:

@@ -7,10 +7,10 @@ environments:
     default_database: development
     development:
         adapter: mysql
-        host: database      # Internal docker container name
-        name: assess_db
-        user: root          # Yes this is bad I know
-        pass: secret
+        host: '%%PHINX_DB_HOST%%'
+        name: '%%PHINX_DB_DATABASE%%'
+        user: '%%PHINX_DB_USERNAME%%'
+        pass: '%%PHINX_DB_PASSWORD%%'
         port: 3306
         charset: utf8
 version_order: creation
