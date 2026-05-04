@@ -1,20 +1,21 @@
 <?php
 
-namespace Api\Authors;
+namespace Api\Currencies;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use Api\Database\Connection;
 
-class AuthorsController
+class CurrencyController
 {
     public function index(Request $request, Response $response)
     {
         $db = Connection::make();
 
-        $authors = $db->query('SELECT * FROM authors')
+        $currencies = $db->query('SELECT * FROM currencies')
             ->fetchAll();
 
-        return $response->getBody()->write(json_encode($authors));
+        return $response->getBody()->write(json_encode($currencies));
     }
+
 }
