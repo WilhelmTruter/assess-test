@@ -44,3 +44,14 @@ The entry point into each app is `/[app|api]/public/index.php`. All this file do
 and a `/[app|api]/src/routes.php` file.
 
 The `routes.php` file boots up Slim Framework v3 and defines the routes for each codebase.
+
+
+## To Run on windows and GitBash
+
+> docker-compose up --build
+> cd /app
+> docker run --rm --volume "/${PWD}:/app" composer install -n --ignore-platform-reqs
+> cd ../api
+> docker run --rm --volume "/${PWD}:/app" composer install -n --ignore-platform-reqs
+> docker-compose exec api php vendor/bin/phinx migrate
+> docker-compose exec api php vendor/bin/phinx seed:run
