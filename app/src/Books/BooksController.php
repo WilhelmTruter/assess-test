@@ -54,7 +54,7 @@ class BooksController
             // Check if selected author is exists.
             if(!empty($inputs['author_id'])) {
                 // Validate that the author exists before trying to create the book
-                $ch = curl_init('http://api.localtest.me//authors/fetch?id='.$inputs['author_id']);
+                $ch = curl_init('http://api.localtest.me/authors/fetch?id='.$inputs['author_id']);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $author = json_decode(curl_exec($ch));
                 curl_close($ch);
@@ -97,6 +97,11 @@ class BooksController
 
                 // Redirect back to book listing
                 return $response->withStatus(302)->withHeader('Location', '/books');
+            } else {
+                $inputs                 = [];
+                $inputs['author_id']    = isset($request->getParsedBody()['author_id']) ? filter_var($request->getParsedBody()['author_id'], FILTER_SANITIZE_NUMBER_INT) : null;
+                $inputs['title']        = isset($request->getParsedBody()['title']) ? $request->getParsedBody()['title'] : null;
+                $inputs['price']['ZAR'] = isset($request->getParsedBody()['price']['ZAR']) ? $request->getParsedBody()['price']['ZAR'] : null;
             }
         }
 
@@ -109,7 +114,9 @@ class BooksController
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
-            'authors' => $authors, 'errors' => (!empty($errors) ? implode("<br />", $errors) : null),
+            'authors' => $authors, 
+            'errors' => (!empty($errors) ? implode("<br />", $errors) : null),
+            'inputs' => (!empty($inputs) ? $inputs : null)
         ]);
     }
 }
