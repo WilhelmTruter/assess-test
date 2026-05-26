@@ -17,4 +17,15 @@ class AuthorsController
 
         return $response->getBody()->write(json_encode($authors));
     }
+
+    public function fetch(Request $request, Response $response)
+    {
+        $params = $request->getQueryParams();
+        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
+        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+
+        $author = $db->query('SELECT * FROM authors WHERE id = ' . $params['id'])->fetch();
+
+        return $response->getBody()->write(json_encode($author));
+    }
 }
