@@ -12,7 +12,7 @@ class BooksController
         $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
         $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-        $books = $db->query('SELECT * FROM books')
+        $books = $db->query('SELECT * FROM books b inner join book_pricing bp on b.id = bp.book_id inner join currencies c on bp.currency_id = c.id')
             ->fetchAll();
 
         return $response->getBody()->write(json_encode($books));
