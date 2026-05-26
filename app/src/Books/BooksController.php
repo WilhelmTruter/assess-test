@@ -41,9 +41,11 @@ class BooksController
 
     public function create(Request $request, Response $response)
     {
+        $errors = [];
+
         // Check if form data has been sent
         if (!empty($request->getParsedBody())) {
-            $errors                 = [];
+            
             $inputs                 = [];
             $inputs['author_id']    = isset($request->getParsedBody()['author_id']) ? filter_var($request->getParsedBody()['author_id'], FILTER_SANITIZE_NUMBER_INT) : null;
             $inputs['title']        = isset($request->getParsedBody()['title']) ? filter_var($request->getParsedBody()['title']) : null;
@@ -86,15 +88,16 @@ class BooksController
                 }
             }
             
-print_r($errors); exit;
-            // Make the api call to create the book
-            $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($inputs));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_exec($ch);
-            curl_close($ch);
+            if(count($errors) == 0) {
+                // Make the api call to create the book
+                $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($inputs));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_exec($ch);
+                curl_close($ch);
 
-            // Redirect back to book listing
-            return $response->withStatus(302)->withHeader('Location', '/books');
+                // Redirect back to book listing
+                return $response->withStatus(302)->withHeader('Location', '/books');
+            }
         }
 
         // Get all the authors
@@ -106,7 +109,7 @@ print_r($errors); exit;
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
-            'authors' => $authors,
+            'authors' => $authors, 'errors' => (!empty($errors) ? implode("<br />", $errors) : null),
         ]);
     }
 }

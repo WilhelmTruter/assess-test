@@ -37,4 +37,8 @@
             </td>
         </tr>
     </table>
+    <?php if(!empty($errors)) { ?>
+        <b style="color: red;">Errors:</b><br />
+        <div style="color: red;"><?=$errors;?></div>
+    <?php } ?>
 </form>
