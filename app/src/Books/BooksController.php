@@ -49,27 +49,28 @@ class BooksController
             $inputs                 = [];
             $inputs['author_id']    = isset($request->getParsedBody()['author_id']) ? filter_var($request->getParsedBody()['author_id'], FILTER_SANITIZE_NUMBER_INT) : null;
             $inputs['title']        = isset($request->getParsedBody()['title']) ? filter_var($request->getParsedBody()['title']) : null;
-            $inputs['price']['ZAR'] = isset($request->getParsedBody()['price']['ZAR']) ? filter_var($request->getParsedBody()['price']['ZAR'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : null;
+            $inputs['price']        = isset($request->getParsedBody()['price']) ? filter_var($request->getParsedBody()['price'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : null;
+            $inputs['currency_iso']  = isset($request->getParsedBody()['currency_iso']) ? filter_var($request->getParsedBody()['currency_iso']) : null;
 
-            // Check if selected author is exists.
-            if(!empty($inputs['author_id'])) {
-                // Validate that the author exists before trying to create the book
-                $ch = curl_init('http://api.localtest.me/authors/fetch?id='.$inputs['author_id']);
+            // Check if selected currency is exists.
+            if(!empty($inputs['currency_iso'])) {
+                // Validate that the currency exists before trying to create the book
+                $ch = curl_init('http://api.localtest.me/currencies/fetch?iso='.$inputs['currency_iso']);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                $author = json_decode(curl_exec($ch));
+                $currency = json_decode(curl_exec($ch));
                 curl_close($ch);
-
-                if(empty($author)) {
-                    $errors[] = 'Author not found - Please check your selection and try again.';
+                if(empty($currency)) {
+                    $errors[] = 'Currency not found - Please check your selection and try again.';
                 }
             } else {
-                $errors[] = 'Please select an author to create the book.';
+                $errors[] = 'Please select a currency to create the book.';
             }
+
             // Check the title
             if(empty($inputs['title'])) {
                 $errors[] = 'Please enter a title for the book.';
             } else {
-                // Only enter letters, numbers, spaces and hypen and aphostrophes for the title
+                // Only enter letters, numbers, spaces and hyphen and apostrophe for the title
                 if(!preg_match("/^[a-zA-Z0-9\s\-\']+$/", $inputs['title'])) {
                     $errors[] = 'The title entered had some invalid characters, please check your input and try again.';
                 }
@@ -79,11 +80,11 @@ class BooksController
                 }
             }
             // Check the price            
-            if(empty($inputs['price']['ZAR'])) {
+            if(empty($inputs['price'])) {
                 $errors[] = 'Please enter the amount of the book';
             } else {
                 // Check if the price entered is the same after sanitization.
-                if($inputs['price']['ZAR'] != $request->getParsedBody()['price']['ZAR']) {
+                if($inputs['price'] != $request->getParsedBody()['price']) {
                     $errors[] = 'The price entered had some invalid characters, please check your input and try again.';
                 }
             }
@@ -92,16 +93,16 @@ class BooksController
                 // Make the api call to create the book
                 $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($inputs));
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_exec($ch);
+                json_decode(curl_exec($ch));
                 curl_close($ch);
-
                 // Redirect back to book listing
                 return $response->withStatus(302)->withHeader('Location', '/books');
             } else {
                 $inputs                 = [];
                 $inputs['author_id']    = isset($request->getParsedBody()['author_id']) ? filter_var($request->getParsedBody()['author_id'], FILTER_SANITIZE_NUMBER_INT) : null;
                 $inputs['title']        = isset($request->getParsedBody()['title']) ? $request->getParsedBody()['title'] : null;
-                $inputs['price']['ZAR'] = isset($request->getParsedBody()['price']['ZAR']) ? $request->getParsedBody()['price']['ZAR'] : null;
+                $inputs['price']        = isset($request->getParsedBody()['price']) ? $request->getParsedBody()['price'] : null;
+                $inputs['currency_iso'] = isset($request->getParsedBody()['currency_iso']) ? $request->getParsedBody()['currency_iso'] : null;
             }
         }
 
@@ -111,10 +112,18 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        // Get all the authors
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors, 
+            'currencies' => $currencies,
             'errors' => (!empty($errors) ? implode("<br />", $errors) : null),
             'inputs' => (!empty($inputs) ? $inputs : null)
         ]);
