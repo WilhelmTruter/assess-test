@@ -16,7 +16,6 @@
             <td><?= $book->first_name ?> <?= $book->last_name ?></td>
             <td><?= $book->iso ?> <?= $book->price ?></td>
         </tr>
-        </tr>
     <?php endforeach; ?>
 </table>
 
