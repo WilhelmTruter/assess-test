@@ -35,5 +35,14 @@ services:
       - "MYSQL_ROOT_PASSWORD=secret"
     ports:
       - 33066:3306
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+    depends_on:
+      - database
 volumes:
   assess_db:

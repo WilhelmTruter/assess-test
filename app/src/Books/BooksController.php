@@ -10,6 +10,12 @@ class BooksController
 {
     public function index(Request $request, Response $response)
     {
+
+        //TODO: move the api calls to a separate service class, e.g. BookService, AuthorService, etc. 
+        // TODO: and use that here instead of making the api calls directly in the controller
+        // OR just create helper methods here to make the api calls, e.g. getBooks(), getAuthors(), etc. 
+        // TODO: and use those here instead of making the api calls directly in the controller
+
         // Get all the books to show
         $ch = curl_init('http://api.localtest.me/books');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -18,19 +24,21 @@ class BooksController
 
 
         // Get all the authors
-        $ch = curl_init('http://api.localtest.me/authors');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $authors = json_decode(curl_exec($ch));
-        curl_close($ch);
+        // $ch = curl_init('http://api.localtest.me/authors');
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // $authors = json_decode(curl_exec($ch));
+        // curl_close($ch);
 
         // Loop through all books and add the author to each one for use in the listing template
-        foreach ($books as $key => $book) {
-            foreach ($authors as $author) {
-                if ($book->author_id == $author->id) {
-                    $books[$key]->author = $author;
-                }
-            }
-        }
+
+
+        // foreach ($books as $key => $book) {
+        //     foreach ($authors as $author) {
+        //         if ($book->author_id == $author->id) {
+        //             $books[$key]->author = $author;
+        //         }
+        //     }
+        // }
 
         $renderer = new PhpRenderer('../src/Books/templates/');
         return $renderer->render($response, 'list.php', [
@@ -41,6 +49,7 @@ class BooksController
     public function create(Request $request, Response $response)
     {
         // Check if form data has been sent
+        // TODO: use getParsedBody() instead of getQueryParams() to get the form data from the POST request
         if ($params = $request->getQueryParams()) {
             // Make the api call to create the book
             $ch = curl_init('http://api.localtest.me/books/create?'.http_build_query($params));
