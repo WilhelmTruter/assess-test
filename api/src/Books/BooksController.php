@@ -21,7 +21,7 @@ class BooksController
                                 authors.first_name, authors.last_name
                             FROM books 
                             LEFT JOIN book_pricing ON books.id = book_pricing.book_id 
-LEFT JOIN authors ON books.author_id = authors.id 
+                            LEFT JOIN authors ON books.author_id = authors.id 
                             LEFT JOIN currencies ON book_pricing.currency_id = currencies.id')
             ->fetchAll();
 
@@ -45,11 +45,13 @@ LEFT JOIN authors ON books.author_id = authors.id
 
         // Create the ZAR price for the book
         $zar = $db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
-        $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) VALUES ('.$book_id.', '.$zar['id'].', '.$params['price']['ZAR'].')');
+
+        $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) 
+
+                   VALUES ('.$book_id.', '.$params['currency_id'].', '.$params['price'].')');
 
         // Fetch the book we just created so we can return it in the response
-        $return = $db->query('SELECT * FROM books WHERE id = '.$book_id)
-            ->fetchAll();
+        $return = $db->query('SELECT * FROM books WHERE id = '.$book_id)->fetchAll();
 
         return $response->getBody()->write(json_encode($return));
     }

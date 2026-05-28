@@ -8,6 +8,7 @@ $app = new \Slim\App([
 ]);
 
 $app->get('/authors', '\Api\Authors\AuthorsController:index');
+$app->get('/currencies', '\Api\Currencies\CurrenciesController:index');
 
 $app->get('/books', '\Api\Books\BooksController:index');
 $app->get('/books/create', '\Api\Books\BooksController:create');

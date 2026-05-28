@@ -11,7 +11,7 @@ class BooksController
     public function index(Request $request, Response $response)
     {
 
-        //TODO: move the api calls to a separate service class, e.g. BookService, AuthorService, etc. 
+        // TODO: move the api calls to a separate service class, e.g. BookService, AuthorService, etc. 
         // TODO: and use that here instead of making the api calls directly in the controller
         // OR just create helper methods here to make the api calls, e.g. getBooks(), getAuthors(), etc. 
         // TODO: and use those here instead of making the api calls directly in the controller
@@ -67,10 +67,16 @@ class BooksController
         $authors = json_decode(curl_exec($ch));
         curl_close($ch);
 
+        $ch = curl_init('http://api.localtest.me/currencies');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $currencies = json_decode(curl_exec($ch));
+        curl_close($ch);
+
         $renderer = new PhpRenderer('../src/Books/templates/');
 
         return $renderer->render($response, 'create.php', [
             'authors' => $authors,
+            'currencies' => $currencies,
         ]);
     }
 }
