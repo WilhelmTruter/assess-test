@@ -4,6 +4,7 @@ namespace Api\Books;
 
 use Api\Database\Database;
 use Api\Api\ApiController;
+use PDO;
 use PDOException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -15,8 +16,26 @@ class BooksController extends ApiController
     // -------------------------------------------------------------------------
     public function index(Request $request, Response $response): Response
     {
+        $params  = $request->getQueryParams();
+        $page    = max(1, (int) ($params['page'] ?? 1));
+        $perPage = 10;
+        $offset  = ($page - 1) * $perPage;
+
         $db = Database::getConnection();
 
+        // Total count for pagination metadata
+        $countStmt = $db->prepare('
+            SELECT COUNT(DISTINCT books.id) AS total
+            FROM books
+            LEFT JOIN book_pricing ON books.id        = book_pricing.book_id
+            LEFT JOIN authors      ON books.author_id = authors.id
+            LEFT JOIN currencies   ON book_pricing.currency_id = currencies.id
+        ');
+        $countStmt->execute();
+        $total    = (int) $countStmt->fetchColumn();
+        $lastPage = max(1, (int) ceil($total / $perPage));
+
+        // Paginated results — bindValue enforces integer type for LIMIT/OFFSET
         $stmt = $db->prepare('
             SELECT
                 books.id,
@@ -31,12 +50,27 @@ class BooksController extends ApiController
             LEFT JOIN book_pricing ON books.id          = book_pricing.book_id
             LEFT JOIN authors      ON books.author_id   = authors.id
             LEFT JOIN currencies   ON book_pricing.currency_id = currencies.id
-        ');
+            ORDER BY books.id ASC
+            LIMIT :limit OFFSET :offset');
+
+        $stmt->bindValue(':limit',  $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset,  PDO::PARAM_INT);
 
         $stmt->execute();
         $books = $stmt->fetchAll();
 
-        return $this->jsonResponse($response, $books);
+        // return $this->jsonResponse($response, $books);
+        return $this->jsonResponse($response, [
+            'books' => $books,
+            'pagination' => [
+                'total'        => $total,
+                'per_page'     => $perPage,
+                'current_page' => $page,
+                'last_page'    => $lastPage,
+                'from'         => $total > 0 ? $offset + 1 : 0,
+                'to'           => min($offset + $perPage, $total),
+            ],
+        ]);
     }
 
     // -------------------------------------------------------------------------

@@ -50,7 +50,7 @@ class Database
 
     private static function requireEnv(string $key): string
     {
-        $value = getenv($key);
+        $value = $_ENV[$key] ?? '';
 
         if ($value === false || $value === '') {
             throw new RuntimeException("Missing required environment variable: {$key}");

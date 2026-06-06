@@ -8,13 +8,19 @@
   },
   "autoload": {
     "psr-4": {
-      "Api\\": "./src/"
+      "Api\\": "./src/",
+      "Api\\Factories\\": "database/factories/",
+      "Api\\Seeders\\": "database/seeders/"
     }
   },
   "require": {
     "ext-pdo": "*",
     "ext-json": "*",
     "slim/slim": "^3.12",
-    "robmorgan/phinx": "^0.10.6"
+    "robmorgan/phinx": "^0.10.6",
+    "vlucas/phpdotenv": "^4.1"
+  },
+  "require-dev": {
+    "fakerphp/faker": "^1.24"
   }
 }
