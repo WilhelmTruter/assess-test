@@ -1,17 +1,12 @@
 <?php
 
-// Bootstrap Slim Framework
-$app = new \Slim\App([
-    'settings' => [
-        'displayErrorDetails' => true, // you would want this false in production
-    ],
-]);
+use App\Authors\AuthorsController;
+use App\Books\BooksController;
 
-// Web app frontend routes
-$app->get('/books', '\App\Books\BooksController:index');
-$app->get('/books/create', '\App\Books\BooksController:create');
+$app->get('/books',          BooksController::class   . ':index');
+$app->get('/books/create',   BooksController::class   . ':create');
+$app->post('/books/create',  BooksController::class   . ':create');
 
-// We don't have a homepage for this web app so just head to the books listing on first load
-$app->redirect('/', '/books');
-
-$app->run();
+$app->get('/authors',        AuthorsController::class . ':index');
+$app->get('/authors/create', AuthorsController::class . ':create');
+$app->post('/authors/create',AuthorsController::class . ':create');
