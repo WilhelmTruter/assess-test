@@ -2,19 +2,31 @@
 
 namespace Api\Authors;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use Api\Database\Database;
+use Api\Api\ApiController;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
-class AuthorsController
+class AuthorsController extends ApiController
 {
-    public function index(Request $request, Response $response)
+    // -------------------------------------------------------------------------
+    // GET /authors
+    // -------------------------------------------------------------------------
+    public function index(Request $request, Response $response): Response
     {
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $db = Database::getConnection();
 
-        $authors = $db->query('SELECT * FROM authors')
-            ->fetchAll();
+        $stmt = $db->prepare('
+            SELECT
+                id,
+                first_name,
+                last_name
+            FROM authors
+        ');
 
-        return $response->getBody()->write(json_encode($authors));
+        $stmt->execute();
+        $authors = $stmt->fetchAll();
+
+        return $this->jsonResponse($response, $authors);
     }
 }

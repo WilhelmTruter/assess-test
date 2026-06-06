@@ -2,19 +2,29 @@
 
 namespace Api\Currencies;
 
+use Api\Database\Database;
+use Api\Api\ApiController;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-class CurrenciesController
+class CurrenciesController extends ApiController
 {
     public function index(Request $request, Response $response)
     {
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 
-        $currencies = $db->query('SELECT * FROM currencies')
-            ->fetchAll();
+        $db = Database::getConnection();
 
-        return $response->getBody()->write(json_encode($currencies));
+        $stmt = $db->prepare('
+            SELECT
+                id,
+                iso,
+                name
+            FROM currencies
+        ');
+        
+        $stmt->execute();
+        $currencies = $stmt->fetchAll();
+
+        return $this->jsonResponse($response, $currencies);
     }
 }

@@ -2,57 +2,139 @@
 
 namespace Api\Books;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
+use Api\Database\Database;
+use Api\Api\ApiController;
+use PDOException;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
-class BooksController
+class BooksController extends ApiController
 {
-    public function index(Request $request, Response $response)
+    // -------------------------------------------------------------------------
+    // GET /books
+    // -------------------------------------------------------------------------
+    public function index(Request $request, Response $response): Response
     {
-        // TODO; create a separate Database class into a separate file and move this code there, 
-        // TODO: then we can just call $db = Database::getConnection() here instead of repeating this code in every controller
-        // TODO: move 'root', 'secret' into environment variables and load them here as well
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $db = Database::getConnection();
 
-        //use prepared statuements to avoind sql injecion
+        $stmt = $db->prepare('
+            SELECT
+                books.id,
+                books.title,
+                books.author_id,
+                book_pricing.price,
+                currencies.id  AS currency_id,
+                currencies.iso AS currency_iso,
+                authors.first_name,
+                authors.last_name
+            FROM books
+            LEFT JOIN book_pricing ON books.id          = book_pricing.book_id
+            LEFT JOIN authors      ON books.author_id   = authors.id
+            LEFT JOIN currencies   ON book_pricing.currency_id = currencies.id
+        ');
 
-        $books = $db->query('SELECT  books.id, books.title, books.author_id, book_pricing.price, currencies.id, currencies.iso,
-                                authors.first_name, authors.last_name
-                            FROM books 
-                            LEFT JOIN book_pricing ON books.id = book_pricing.book_id 
-                            LEFT JOIN authors ON books.author_id = authors.id 
-                            LEFT JOIN currencies ON book_pricing.currency_id = currencies.id')
-            ->fetchAll();
+        $stmt->execute();
+        $books = $stmt->fetchAll();
 
-        return $response->getBody()->write(json_encode($books));
+        return $this->jsonResponse($response, $books);
     }
 
-    public function create(Request $request, Response $response)
+    // -------------------------------------------------------------------------
+    // POST /books
+    // -------------------------------------------------------------------------
+    public function create(Request $request, Response $response): Response
     {
-        //TODO: Same as above, move this code into a separate Database class and use prepared statements to avoind sql injecion
-        $db = new \PDO('mysql:host=database;dbname=assess_db', 'root', 'secret');
-        $db->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        // getParsedBody() reads POST/JSON body — getQueryParams() only reads ?query=string
+        $params = (array) ($request->getParsedBody() ?? []);
 
-        $params = $request->getQueryParams();
+        $errors = $this->validateBookParams($params);
+        if (!empty($errors)) {
+            return $this->jsonResponse($response, ['errors' => $errors], 422);
+        }
 
-        //TODO: use prepared statuements to avoind sql injecion
-        // TODO: validate the input data before using it in the query, e.g. check if title is a string, author_id is an integer, price is a number, etc.
-        // Create the new book
-        $db->exec('INSERT INTO books (title, author_id) VALUES ("'.$params['title'].'", "'.$params['author_id'].'")');
+        $db = Database::getConnection();
 
-        $book_id = $db->lastInsertId();
+        try {
+            // Wrap both INSERTs in a transaction so they succeed or fail together
+            $db->beginTransaction();
 
-        // Create the ZAR price for the book
-        $zar = $db->query('SELECT * FROM currencies WHERE iso = "ZAR"')->fetch();
+            $stmt = $db->prepare(
+                'INSERT INTO books (title, author_id) VALUES (:title, :author_id)'
+            );
+            $stmt->execute([
+                ':title'     => $params['title'],
+                ':author_id' => (int) $params['author_id'],
+            ]);
 
-        $db->exec('INSERT INTO book_pricing (book_id, currency_id, price) 
+            $bookId = (int) $db->lastInsertId();
 
-                   VALUES ('.$book_id.', '.$params['currency_id'].', '.$params['price'].')');
+            $stmt = $db->prepare(
+                'INSERT INTO book_pricing (book_id, currency_id, price)
+                 VALUES (:book_id, :currency_id, :price)'
+            );
+            $stmt->execute([
+                ':book_id'     => $bookId,
+                ':currency_id' => (int) $params['currency_id'],
+                ':price'       => (float) $params['price'],
+            ]);
 
-        // Fetch the book we just created so we can return it in the response
-        $return = $db->query('SELECT * FROM books WHERE id = '.$book_id)->fetchAll();
+            $db->commit();
+        } catch (PDOException $e) {
+            $db->rollBack();
+            return $this->jsonResponse($response, ['error' => 'Failed to create book'], 500);
+        }
 
-        return $response->getBody()->write(json_encode($return));
+        // Return the full book record (same shape as index) with 201 Created
+        $stmt = $db->prepare('
+            SELECT
+                books.id,
+                books.title,
+                books.author_id,
+                book_pricing.price,
+                currencies.id  AS currency_id,
+                currencies.iso AS currency_iso,
+                authors.first_name,
+                authors.last_name
+            FROM books
+            LEFT JOIN book_pricing ON books.id          = book_pricing.book_id
+            LEFT JOIN authors      ON books.author_id   = authors.id
+            LEFT JOIN currencies   ON book_pricing.currency_id = currencies.id
+            WHERE books.id = :id
+        ');
+        $stmt->execute([':id' => $bookId]);
+        $book = $stmt->fetch();
+
+        return $this->jsonResponse($response, $book, 201);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Validates required fields for book creation.
+     * Returns an associative array of field => message pairs; empty = valid.
+     */
+    private function validateBookParams(array $params): array
+    {
+        $errors = [];
+
+        if (empty($params['title']) || !is_string($params['title'])) {
+            $errors['title'] = 'Title is required and must be a string.';
+        }
+
+        if (empty($params['author_id']) || !ctype_digit((string) $params['author_id'])) {
+            $errors['author_id'] = 'Author ID is required and must be a positive integer.';
+        }
+
+        if (empty($params['currency_id']) || !ctype_digit((string) $params['currency_id'])) {
+            $errors['currency_id'] = 'Currency ID is required and must be a positive integer.';
+        }
+
+        if (!isset($params['price']) || !is_numeric($params['price']) || (float) $params['price'] < 0) {
+            $errors['price'] = 'Price is required and must be a non-negative number.';
+        }
+
+        return $errors;
     }
 }
